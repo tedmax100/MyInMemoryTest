@@ -11,6 +11,7 @@ namespace MyInMemoryTest
     public class EmployeeRepositoryTests
     {
         private IEmployeeRepository _repository;
+        private EmployeeContext _context;
         [SetUp]
         public void Setup()
         {
@@ -18,10 +19,10 @@ namespace MyInMemoryTest
                 .UseInMemoryDatabase("MockDB")
                 .Options;
 
-            var initContext = new EmployeeContext(options);
-            initContext.Database.EnsureDeleted();
-
-            _repository = new EmployeeRepository(initContext);
+            _context = new EmployeeContext(options);
+            _context.Database.EnsureDeleted();
+            
+            _repository = new EmployeeRepository(_context);
         }
 
         [Test]
@@ -39,7 +40,9 @@ namespace MyInMemoryTest
             
             // assert : check the data was existed in repository
             var query =  _repository.FindByDepartmentId(DepartmentEnum.海外企業開發組);
-            query.Result[0].Name.Should().Be(newEmployee.FirstName + " " +newEmployee.LastName);
+            _context.Employees.Where(e => e.Name == newEmployee.FirstName + " " + newEmployee.LastName)
+                .Select(e => e).Count().Should().Be(1);
+           // query.Result[0].Name.Should().Be(newEmployee.FirstName + " " +newEmployee.LastName);
         }
 
         [Test]
