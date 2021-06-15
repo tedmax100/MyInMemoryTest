@@ -36,11 +36,12 @@ namespace MyInMemoryTest
                 Department = DepartmentEnum.海外企業開發組
             };
             // act : save the employee data
-            _repository.AddAsync(newEmployee);
+            _repository.AddAsync(newEmployee).Wait();
             
             // assert : check the data was existed in repository
             var query =  _repository.FindByDepartmentId(DepartmentEnum.海外企業開發組);
-            _context.Employees.Where(e => e.Name == newEmployee.FirstName + " " + newEmployee.LastName)
+            _context.Employees
+                .Where(e => e.Name == newEmployee.FirstName + " " + newEmployee.LastName)
                 .Select(e => e).Count().Should().Be(1);
            // query.Result[0].Name.Should().Be(newEmployee.FirstName + " " +newEmployee.LastName);
         }
